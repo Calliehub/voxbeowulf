@@ -1,0 +1,4 @@
+bs4
+pysubs2
+requests
+structlog
