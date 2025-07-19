@@ -1,0 +1,28 @@
+body.home {
+  h1 {
+    margin-top: 2rem;
+    font-family: $font-family-serif;
+    font-size: 48px;
+    font-style: italic;
+    color: #333;
+    .title {
+      display: block;
+      font-size: 6rem;
+      font-weight: 600;
+      font-style: normal;
+    }
+  }
+  h2 {
+    margin-bottom: 4rem;
+    font-family: $font-family-serif;
+    font-style: italic;
+    color: #333;
+  }
+  .lead {
+    font-weight: 400;
+    a {
+      margin-left: 0.3em;
+      margin-right: 0.3em;
+    }
+  }
+}

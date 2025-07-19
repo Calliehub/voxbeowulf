@@ -1,0 +1,64 @@
+{% extends "site_base.html" %}
+
+{% block head_title %}Vocabulary: {{ scope }}{% endblock %}
+
+{% block body_class %}vocab{% endblock %}
+
+{% block body %}
+
+  <form action="." class="form-inline">
+    <select class="form-control form-control-sm" name="chunk_type">
+      <option value="lines"{% if chunk_type == "lines" %} selected{% endif %}>Line(s)</option>
+      <option value="fitt"{% if chunk_type == "fitt" %} selected{% endif %}>Fitt</option>
+    </select>
+    {% if start != end %}
+      <input class="form-control form-control-sm"type="text" name="chunk_id" value="{{ start }}-{{ end }}">
+    {% else %}
+      <input class="form-control form-control-sm" type="text" name="chunk_id" value="{{ start }}">
+    {% endif %}
+  </form>
+
+  <div class="vocab-head">
+    <h1>Vocabulary: {{ scope }}</h1>
+    {% if chunk_type == "lines" %}
+      <a class="switch" href="{% url 'read_lines' start end %}">read line{% if start != end %}s{% endif %}</a>
+    {% endif %}
+    {% if chunk_type == "fitt" %}
+      <a class="switch" href="{% url 'read_fitt' start %}">read fitt</a>
+    {% endif %}
+  </div>
+
+  {% regroup token_data by lemma as lemmas %}
+
+  {% for lemma, lemma_data in lemmas %}
+    {% regroup lemma_data by pos as lemma_pos %}
+
+    {% for pos, pos_data in lemma_pos %}
+      {% regroup pos_data by gloss as glosses %}
+
+      {% for gloss, gloss_data in glosses %}
+        <div class="entry">
+          <a class="lemma" href="{% url 'lemma' lemma %}">{{ lemma }}</a>
+          <span class="pos">{{ pos }}</span>
+          <span class="gloss">{{ gloss }}</span>
+          <span class="lines">
+            {% for token in gloss_data %}
+              <a href="{% url 'vocab_lines' token.line_id token.line_id %}">{{ token.line_id }}</a>{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          </span>
+        </div>
+      {% endfor %}
+    {% endfor %}
+
+  {% endfor %}
+
+{% endblock %}
+
+
+{% block scripts %}
+  {{ block.super }}
+  <script>
+    $(function() {
+    });
+  </script>
+{% endblock %}

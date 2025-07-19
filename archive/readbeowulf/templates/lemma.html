@@ -1,0 +1,31 @@
+{% extends "site_base.html" %}
+
+{% block head_title %}Lemma: {{ lemma }}{% endblock %}
+
+{% block body_class %}lemma{% endblock %}
+
+{% block body %}
+
+  <h1>Lemma {{ lemma }}</h1>
+
+  {% for token in token_data %}
+    <div class="entry">
+      <div class="lemma">{{ token.lemma }}</div>
+      <div class="pos">{{ token.pos }}{% if token.parse %}.{{ token.parse }}{% endif %}</div>
+      <div class="pos">{{ token.o }}</div>
+      <div class="pos">{{ token.syntax }}</div>
+      <div class="text">{{ token.text }}</div>
+      <div class="gloss">{{ token.gloss }}</div>
+      <div class="lines"><a href="{% url 'vocab_lines' token.line_id token.line_id %}">{{ token.line_id }}</a></div>
+    </div>
+  {% endfor %}
+{% endblock %}
+
+
+{% block scripts %}
+  {{ block.super }}
+  <script>
+    $(function() {
+    });
+  </script>
+{% endblock %}
