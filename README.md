@@ -27,5 +27,3 @@ python heorot.py
 The Heorot source text is copyright [Benjamin Slade](https://heorot.dk/) 2002-2020.
 
 This work is copyright 2025 by Callie Tweney, and licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1).
-
-fsdsdf
