@@ -1,6 +1,16 @@
-# we follow the heorot.dk numbering throughout
+#!/usr/bin/env python3
+"""
+Beowulf fitt boundaries and line numbering constants.
 
-FITT_BOUNDARIES = [
+This module contains the fitt boundaries and line number markers
+for the Beowulf text, following the heorot.dk numbering system.
+"""
+
+from typing import Dict, List, Tuple, Final, TypedDict
+
+# Fitt boundaries: (start_line, end_line, fitt_name)
+# Note: Fitt 24 doesn't exist in Beowulf, but is included for easier calculations
+FITT_BOUNDARIES: Final[List[Tuple[int, int, str]]] = [
     (1, 52, 'Prologue'),  # prologue
     (53, 114, 'I'),  # 1
     (115, 188, 'II'),
@@ -47,7 +57,9 @@ FITT_BOUNDARIES = [
     (3137, 3182, 'XLIII')
 ]
 
-LINE_NUMBER_MARKERS = {
+# Line number markers for special display
+# These lines get special formatting in the subtitles
+LINE_NUMBER_MARKERS: Final[Dict[int, int]] = {
     5: 5, 10: 10, 15: 15, 20: 20, 25: 25, 30: 30, 35: 35, 40: 40, 45: 45, 50: 50, 55: 55, 60: 60, 65: 65,
     70: 70, 75: 75, 80: 80, 85: 85, 90: 90, 95: 95, 100: 100, 105: 105, 110: 110, 115: 115, 120: 120, 125: 125,
     130: 130, 135: 135, 140: 140, 145: 145, 150: 150, 155: 155, 160: 160, 165: 165, 170: 170, 175: 175,
@@ -115,8 +127,10 @@ LINE_NUMBER_MARKERS = {
     3003: 3003, 3008: 3008, 3013: 3013, 3018: 3018, 3023: 3023, 3028: 3028, 3033: 3033, 3038: 3038, 3043: 3043,
     3048: 3048, 3053: 3053, 3058: 3058, 3063: 3063, 3068: 3068, 3073: 3073, 3078: 3078, 3083: 3083, 3088: 3088,
     3093: 3093, 3098: 3098, 3103: 3103, 3108: 3108, 3113: 3113, 3118: 3118, 3123: 3123, 3128: 3128, 3133: 3133,
-    3138: 3138, 3143: 3143, 3148: 3148, 3153: 3153, 3158: 3158, 3163: 3163, 3168: 3168, 3173: 3173, 3178: 3178}
-#
+    3138: 3138, 3143: 3143, 3148: 3148, 3153: 3153, 3158: 3158, 3163: 3163, 3168: 3168, 3173: 3173, 3178: 3178
+}
+
+# Commented out code for reference - this was used to generate the LINE_NUMBER_MARKERS
 # number_markers = {}
 # offset = 0
 # for i in range(0, 3182):

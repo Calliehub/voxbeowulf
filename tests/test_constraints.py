@@ -10,7 +10,7 @@ import json
 import pytest
 from typing import Dict, List, Optional, Self, TypedDict
 
-from numbering import FITT_BOUNDARIES
+from voxbeowulf.numbering import FITT_BOUNDARIES
 
 
 @pytest.fixture

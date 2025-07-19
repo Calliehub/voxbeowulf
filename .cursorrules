@@ -126,6 +126,8 @@ from .utils import helper_function
 - Use flake8 or pylint for linting
 - Use mypy for type checking
 - Use pre-commit hooks for automated checks
+- Use poetry for Python package management
+- Use pytest for testing
 
 ### Version Control
 - Write meaningful commit messages

@@ -1,14 +1,33 @@
+#!/usr/bin/env python3
+"""
+Beowulf text processing module for heorot.dk data.
+
+This module handles fetching, parsing, and processing Beowulf text data
+from heorot.dk, including conversion to various formats (JSON, CSV, ASS subtitles).
+"""
+
 import csv
 import json
 import logging
 import os
+from typing import Dict, List, Optional, Tuple, Self, TypedDict
 
 import pysubs2
 import requests
 import structlog
 from bs4 import BeautifulSoup
+
 from numbering import FITT_BOUNDARIES, LINE_NUMBER_MARKERS
 
+# Type definitions
+class LineData(TypedDict):
+    """Type definition for line data structure."""
+    line: int
+    oe: str
+    me: str
+    notes: Optional[str]
+
+# Constants
 SECONDS_PER_LINE = 4
 
 ASS_PARAMS = {
@@ -43,9 +62,22 @@ structlog.configure(
 logger = structlog.get_logger()
 
 
-def fetch_and_store(url, filename):
+def fetch_and_store(url: str, filename: str) -> str:
+    """
+    Fetch HTML content from URL and store locally if not already present.
+    
+    Args:
+        url: The URL to fetch content from
+        filename: Local file path to store the content
+        
+    Returns:
+        The HTML content as a string
+        
+    Raises:
+        requests.RequestException: If the HTTP request fails
+    """
     if not os.path.exists(filename):
-        logger.warn("Fetching HTML from heorot.dk")
+        logger.warning("Fetching HTML from heorot.dk")
         response = requests.get(url)
         response.raise_for_status()  # Ensure we got a valid response
 
@@ -53,12 +85,21 @@ def fetch_and_store(url, filename):
             file.write(response.text)
             return response.text
     else:
-        logger.warn("HTML is already stored locally, skipping HTTP fetch")
+        logger.warning("HTML is already stored locally, skipping HTTP fetch")
         with open(filename, 'r', encoding='utf-8') as file:
             return file.read()
 
 
-def parse(html):
+def parse(html: str) -> List[Dict[str, str]]:
+    """
+    Parse HTML content and extract Beowulf text lines.
+    
+    Args:
+        html: HTML content to parse
+        
+    Returns:
+        List of dictionaries containing line data with 'line', 'OE', and 'ME' keys
+    """
     current_line_number = 0
     soup = BeautifulSoup(html, 'html.parser')
 
@@ -74,7 +115,6 @@ def parse(html):
             last_oe = None
 
             for row in table_rows:
-
                 note_divs = row.find_all('div')
                 if len(note_divs) > 0:
                     for note_div in note_divs:
@@ -85,7 +125,7 @@ def parse(html):
 
                 if len(columns) >= 2:
                     if len(columns) > 2:
-                        logger.debug(f"long row found", line=current_line_number + 1, cols=columns)
+                        logger.debug("long row found", line=current_line_number + 1, cols=columns)
 
                     oe_text = columns[0]
                     me_text = columns[1]
@@ -112,16 +152,33 @@ def parse(html):
     return lines
 
 
-def get_fitt(fitt_num, lines):
+def get_fitt(fitt_num: int, lines: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    """
+    Extract lines for a specific fitt.
+    
+    Args:
+        fitt_num: The fitt number to extract
+        lines: List of all line data
+        
+    Returns:
+        List of line data for the specified fitt
+    """
     start = FITT_BOUNDARIES[fitt_num][0]
     end = FITT_BOUNDARIES[fitt_num][1] + 1
     return lines[start:end]
 
 
-def do_file(filestem, url):
+def do_file(filestem: str, url: str) -> None:
+    """
+    Process a file by fetching, parsing, and saving in multiple formats.
+    
+    Args:
+        filestem: Base name for output files
+        url: URL to fetch HTML content from
+    """
     html = fetch_and_store(url, f"data/fitts/{filestem}.html")
     parsed_lines = parse(html)
-    logger.info(f"parsed the file", filestem=filestem, url=url, linecount=len(parsed_lines))
+    logger.info("parsed the file", filestem=filestem, url=url, linecount=len(parsed_lines))
 
     # Save to JSON file
     with open(f"data/fitts/{filestem}.json", "w", encoding="utf-8") as json_file:
@@ -136,9 +193,15 @@ def do_file(filestem, url):
     write_ass(parsed_lines)
 
 
-def write_ass(lines):
+def write_ass(lines: List[Dict[str, str]]) -> None:
+    """
+    Generate ASS subtitle files for each fitt.
+    
+    Args:
+        lines: List of all line data
+    """
     for fitt_id, fitt_bounds in enumerate(FITT_BOUNDARIES):
-        logger.info(f"Writing .ass file for fitt", fitt_id=fitt_id, fitt_bounds=fitt_bounds)
+        logger.info("Writing .ass file for fitt", fitt_id=fitt_id, fitt_bounds=fitt_bounds)
         if fitt_id == 24:
             continue  # there's no 24 in Beowulf
 
@@ -176,16 +239,31 @@ def write_ass(lines):
         subs.save(ASS_PARAMS['output_file'].format(fitt_id=fitt_id), encoding="UTF-8")
 
 
-def make_sub(text, start_time, end_time, style):
-    subtitle = pysubs2.SSAEvent(start=pysubs2.make_time(s=start_time),
-                                end=pysubs2.make_time(s=end_time),
-                                style=ASS_PARAMS[style])
+def make_sub(text: str, start_time: float, end_time: float, style: str) -> pysubs2.SSAEvent:
+    """
+    Create a subtitle event.
+    
+    Args:
+        text: The subtitle text
+        start_time: Start time in seconds
+        end_time: End time in seconds
+        style: Style name for the subtitle
+        
+    Returns:
+        SSAEvent object for the subtitle
+    """
+    subtitle = pysubs2.SSAEvent(
+        start=pysubs2.make_time(s=start_time),
+        end=pysubs2.make_time(s=end_time),
+        style=ASS_PARAMS[style]
+    )
     subtitle.name = style
     subtitle.text = text
     return subtitle
 
 
-def run():
+def run() -> None:
+    """Main function to process the Beowulf text."""
     do_file("maintext", "https://heorot.dk/beowulf-rede-text.html")
 
 
