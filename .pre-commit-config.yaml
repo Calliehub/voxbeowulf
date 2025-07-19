@@ -26,9 +26,9 @@ repos:
     hooks:
       - id: pytest
         name: pytest
-        entry: pytest
+        entry: poetry run pytest
         language: system
         pass_filenames: false
         always_run: true
-        stages: [commit]
-        args: [--tb=short] 
+        stages: [pre-commit]
+        args: [--tb=short]
